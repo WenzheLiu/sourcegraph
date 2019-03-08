@@ -1,6 +1,7 @@
 import React from 'react'
 import { eventLogger } from '../tracking/eventLogger'
 import { SiteAdminAreaRoute } from './SiteAdminArea'
+import { SiteAdminAddExternalServicesPage } from './SiteAdminAddExternalServicesPage'
 const SiteAdminAddExternalServicePage = React.lazy(async () => ({
     default: (await import('./SiteAdminAddExternalServicePage')).SiteAdminAddExternalServicePage,
 }))
@@ -69,9 +70,18 @@ export const siteAdminAreaRoutes: ReadonlyArray<SiteAdminAreaRoute> = [
     },
     {
         path: '/external-services/add',
-        render: props => <SiteAdminAddExternalServicePage {...props} eventLogger={eventLogger} />,
+        render: props => {
+            console.log('# props', props)
+            return <SiteAdminAddExternalServicesPage {...props} eventLogger={eventLogger} />
+        },
         exact: true,
     },
+    // TODO
+    // {
+    //     path: '/external-services/add/:type',
+    //     render: props => <SiteAdminAddExternalServicePage {...props} eventLogger={eventLogger} />,
+    //     exact: true,
+    // },
     {
         path: '/external-services/:id',
         render: props => <SiteAdminExternalServicePage {...props} />,
