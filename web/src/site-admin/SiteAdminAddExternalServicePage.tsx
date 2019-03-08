@@ -8,7 +8,7 @@ import { createAggregateError } from '../../../shared/src/util/errors'
 import { mutateGraphQL } from '../backend/graphql'
 import { PageTitle } from '../components/PageTitle'
 import { refreshSiteFlags } from '../site/backend'
-import { ALL_EXTERNAL_SERVICES, ExternalServiceMetadata, getExternalService } from './externalServices'
+import { ExternalServiceMetadata, getExternalService } from './externalServices'
 import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm'
 
 interface Props {

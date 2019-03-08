@@ -37,11 +37,11 @@ export const GITHUB_EXTERNAL_SERVICE: ExternalServiceMetadata = {
 }`,
 }
 
-type ExternalServiceQualifiers = 'githubcom'
+type ExternalServiceQualifier = 'githubcom'
 
 type ExternalServicesMetadata = {
     default: ExternalServiceMetadata
-} & { [K in ExternalServiceQualifiers]?: ExternalServiceMetadata }
+} & { [K in ExternalServiceQualifier]?: ExternalServiceMetadata }
 
 export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServicesMetadata> = {
     [GQL.ExternalServiceKind.AWSCODECOMMIT]: {
@@ -142,14 +142,13 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
 }
 
-export function getExternalService(kind: GQL.ExternalServiceKind, qualifier?: string): ExternalServiceMetadata {
+export function getExternalService(
+    kind: GQL.ExternalServiceKind,
+    qualifier?: ExternalServiceQualifier
+): ExternalServiceMetadata {
     const servicesMetadata = ALL_EXTERNAL_SERVICES[kind]
-    if (!qualifier || !servicesMetadata[qualifier]) {
+    if (!qualifier) {
         return servicesMetadata.default
     }
-    return servicesMetadata[qualifier]
-}
-
-export function getExternalServiceKinds(): GQL.ExternalServiceKind[] {
-    return Object.entries(ALL_EXTERNAL_SERVICES)
+    return servicesMetadata[qualifier] || servicesMetadata.default
 }

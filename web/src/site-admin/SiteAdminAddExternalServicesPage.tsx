@@ -6,7 +6,7 @@ import { ExternalServiceKind } from '../../../shared/src/graphql/schema'
 import * as GQL from '../../../shared/src/graphql/schema'
 import { PageTitle } from '../components/PageTitle'
 import { ThemeProps } from '../theme'
-import { ALL_EXTERNAL_SERVICES, getExternalService } from './externalServices'
+import { getExternalService } from './externalServices'
 import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm2'
 
 interface SiteAdminAddExternalServiceProps extends ThemeProps {

@@ -6,7 +6,7 @@ import * as GQL from '../../../shared/src/graphql/schema'
 import { ErrorLike } from '../../../shared/src/util/errors'
 import { Form } from '../components/Form'
 import { DynamicallyImportedMonacoSettingsEditor } from '../settings/DynamicallyImportedMonacoSettingsEditor'
-import { ALL_EXTERNAL_SERVICES } from './externalServices'
+import { getExternalService } from './externalServices'
 
 interface Props {
     history: H.History
@@ -48,7 +48,7 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                         // so the editor is keyed on the kind.
                         key={this.props.input.kind}
                         value={this.props.input.config}
-                        jsonSchema={ALL_EXTERNAL_SERVICES[this.props.input.kind].jsonSchema}
+                        jsonSchema={getExternalService(this.props.input.kind).jsonSchema}
                         canEdit={false}
                         loading={this.props.loading}
                         height={300}
