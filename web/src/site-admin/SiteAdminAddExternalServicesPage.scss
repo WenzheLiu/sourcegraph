@@ -3,3 +3,12 @@
         display: block;
     }
 }
+
+.external-services-form {
+    &__quick-configure-button {
+        margin: 0.25rem 0.25rem 0.25rem 0;
+    }
+    &__quick-configure-label {
+        font-weight: bold;
+    }
+}

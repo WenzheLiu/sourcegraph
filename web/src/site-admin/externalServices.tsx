@@ -1,3 +1,4 @@
+import React from 'react'
 import awsCodeCommitSchemaJSON from '../../../schema/aws_codecommit.schema.json'
 import bitbucketServerSchemaJSON from '../../../schema/bitbucket_server.schema.json'
 import githubSchemaJSON from '../../../schema/github.schema.json'
@@ -24,6 +25,7 @@ export const GITHUB_EXTERNAL_SERVICE: ExternalServiceMetadata = {
     title: 'GitHub repositories',
     jsonSchema: githubSchemaJSON,
     displayName: 'GitHub',
+    helpElement: <span>This is help</span>,
     defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
@@ -70,7 +72,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
     [GQL.ExternalServiceKind.BITBUCKETSERVER]: {
         default: {
-            // NEXT: add title
+            title: 'Bitbucket Server repositories',
             jsonSchema: bitbucketServerSchemaJSON,
             displayName: 'Bitbucket Server',
             defaultConfig: `{
@@ -89,6 +91,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     [GQL.ExternalServiceKind.GITHUB]: { default: GITHUB_EXTERNAL_SERVICE },
     [GQL.ExternalServiceKind.GITLAB]: {
         default: {
+            title: 'GitLab projects',
             jsonSchema: gitlabSchemaJSON,
             displayName: 'GitLab',
             defaultConfig: `{
@@ -106,6 +109,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
     [GQL.ExternalServiceKind.GITOLITE]: {
         default: {
+            title: 'Gitolite repositories',
             jsonSchema: gitoliteSchemaJSON,
             displayName: 'Gitolite',
             defaultConfig: `{
@@ -120,6 +124,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
     [GQL.ExternalServiceKind.PHABRICATOR]: {
         default: {
+            title: 'Phabricator connection',
             jsonSchema: phabricatorSchemaJSON,
             displayName: 'Phabricator',
             defaultConfig: `{
@@ -135,6 +140,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
     [GQL.ExternalServiceKind.OTHER]: {
         default: {
+            title: 'repositories by Git clone URL',
             jsonSchema: otherExternalServiceSchemaJSON,
             displayName: 'Other',
             defaultConfig: `{

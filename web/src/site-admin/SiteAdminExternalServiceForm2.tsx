@@ -6,15 +6,14 @@ import * as GQL from '../../../shared/src/graphql/schema'
 import { ErrorLike } from '../../../shared/src/util/errors'
 import { Form } from '../components/Form'
 import { DynamicallyImportedMonacoSettingsEditor } from '../settings/DynamicallyImportedMonacoSettingsEditor'
-import { getExternalService } from './externalServices'
+import { ExternalServiceMetadata } from './externalServices'
 
 interface Props {
     history: H.History
-    input: GQL.IAddExternalServiceInput
+    externalService: ExternalServiceMetadata
     isLightTheme: boolean
     error?: ErrorLike
     mode: 'edit' | 'create'
-    submitText: string
     loading: boolean
     onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void
     onChange: (change: GQL.IAddExternalServiceInput) => void
@@ -36,19 +35,33 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                         autoComplete="off"
                         autoFocus={true}
                         spellCheck={false}
-                        value={this.props.input.displayName}
+                        value={this.props.externalService.displayName}
                         onChange={this.onDisplayNameChange}
                         disabled={this.props.loading}
                     />
                 </div>
                 <div className="form-group">
+                    <label className="external-services-form__quick-configure-label">Quick configure:</label>
+                    <p>
+                        <button className="btn btn-secondary btn-sm external-services-form__quick-configure-button">
+                            Set access token
+                        </button>
+                        <button className="btn btn-secondary btn-sm external-services-form__quick-configure-button">
+                            Add specific repository
+                        </button>
+                        <button className="btn btn-secondary btn-sm external-services-form__quick-configure-button">
+                            Add organization repositories
+                        </button>
+                        <button className="btn btn-secondary btn-sm external-services-form__quick-configure-button">
+                            Add repositories matching GitHub search query
+                        </button>
+                    </p>
                     <DynamicallyImportedMonacoSettingsEditor
                         // DynamicallyImportedMonacoSettingsEditor does not re-render the passed input.config
                         // if it thinks the config is dirty. We want to always replace the config if the kind changes
                         // so the editor is keyed on the kind.
-                        key={this.props.input.kind}
-                        value={this.props.input.config}
-                        jsonSchema={getExternalService(this.props.input.kind).jsonSchema}
+                        value={this.props.externalService.defaultConfig}
+                        jsonSchema={this.props.externalService.jsonSchema}
                         canEdit={false}
                         loading={this.props.loading}
                         height={300}
@@ -66,17 +79,19 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                     disabled={this.props.loading}
                 >
                     {this.props.loading && <LoadingSpinner className="icon-inline" />}
-                    {this.props.mode === 'edit' ? `Update ${this.props.submitText}` : `Add ${this.props.submitText}`}
+                    {this.props.mode === 'edit'
+                        ? `Update ${this.props.externalService.title}`
+                        : `Add ${this.props.externalService.title}`}
                 </button>
             </Form>
         )
     }
 
     private onDisplayNameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-        this.props.onChange({ ...this.props.input, displayName: event.currentTarget.value })
+        // this.props.onChange({ ...this.props.input, displayName: event.currentTarget.value })
     }
 
     private onConfigChange = (config: string) => {
-        this.props.onChange({ ...this.props.input, config })
+        // this.props.onChange({ ...this.props.input, config })
     }
 }
