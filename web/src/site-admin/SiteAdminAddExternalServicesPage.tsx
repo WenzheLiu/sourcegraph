@@ -13,8 +13,8 @@ interface SiteAdminAddExternalServiceProps extends ThemeProps {
     history: H.History
     kind: ExternalServiceKind
     title: string
-    displayName: string
     submitText: string
+    displayName: string
     helpElement?: JSX.Element | string
 }
 

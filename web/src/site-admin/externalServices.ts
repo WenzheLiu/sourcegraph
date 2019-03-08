@@ -9,11 +9,19 @@ import * as GQL from '../../../shared/src/graphql/schema'
 
 export interface ExternalServiceMetadata {
     jsonSchema: { $id: string }
-    displayName: string
     defaultConfig: string
+
+    /**
+     * Default display name
+     */
+    displayName: string
+
+    helpElement?: JSX.Element | string
+    title: string
 }
 
 export const GITHUB_EXTERNAL_SERVICE: ExternalServiceMetadata = {
+    title: 'GitHub repositories',
     jsonSchema: githubSchemaJSON,
     displayName: 'GitHub',
     defaultConfig: `{
@@ -46,6 +54,7 @@ type ExternalServicesMetadata = {
 export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServicesMetadata> = {
     [GQL.ExternalServiceKind.AWSCODECOMMIT]: {
         default: {
+            title: 'AWS CodeCommit repositories',
             jsonSchema: awsCodeCommitSchemaJSON,
             displayName: 'AWS CodeCommit',
             defaultConfig: `{
@@ -61,6 +70,7 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
     },
     [GQL.ExternalServiceKind.BITBUCKETSERVER]: {
         default: {
+            // NEXT: add title
             jsonSchema: bitbucketServerSchemaJSON,
             displayName: 'Bitbucket Server',
             defaultConfig: `{
