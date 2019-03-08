@@ -5,9 +5,8 @@ import * as React from 'react'
 import * as GQL from '../../../shared/src/graphql/schema'
 import { ErrorLike } from '../../../shared/src/util/errors'
 import { Form } from '../components/Form'
-import { Select } from '../components/Select'
 import { DynamicallyImportedMonacoSettingsEditor } from '../settings/DynamicallyImportedMonacoSettingsEditor'
-import { ALL_EXTERNAL_SERVICES, getExternalService } from './externalServices'
+import { ALL_EXTERNAL_SERVICES } from './externalServices'
 
 interface Props {
     history: H.History
@@ -15,6 +14,7 @@ interface Props {
     isLightTheme: boolean
     error?: ErrorLike
     mode: 'edit' | 'create'
+    submitText: string
     loading: boolean
     onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void
     onChange: (change: GQL.IAddExternalServiceInput) => void
@@ -42,32 +42,13 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="external-service-page-form-kind">Kind</label>
-                    <Select
-                        id="external-service-page-form-kind"
-                        onChange={this.onKindChange}
-                        required={true}
-                        disabled={this.props.loading || this.props.mode === 'edit'}
-                        value={this.props.input.kind}
-                    >
-                        {Object.entries(ALL_EXTERNAL_SERVICES).map(([kind, service]) => (
-                            <option key={kind} value={kind}>
-                                {/*
-                                    ** TODO: delete this file (for now, this fixes the type error)
-                                    {service.displayName}
-                                */}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
-                <div className="form-group">
                     <DynamicallyImportedMonacoSettingsEditor
                         // DynamicallyImportedMonacoSettingsEditor does not re-render the passed input.config
                         // if it thinks the config is dirty. We want to always replace the config if the kind changes
                         // so the editor is keyed on the kind.
                         key={this.props.input.kind}
                         value={this.props.input.config}
-                        jsonSchema={getExternalService(this.props.input.kind).jsonSchema}
+                        jsonSchema={ALL_EXTERNAL_SERVICES[this.props.input.kind].jsonSchema}
                         canEdit={false}
                         loading={this.props.loading}
                         height={300}
@@ -85,7 +66,7 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                     disabled={this.props.loading}
                 >
                     {this.props.loading && <LoadingSpinner className="icon-inline" />}
-                    {this.props.mode === 'edit' ? 'Update external service' : 'Add external service'}
+                    {this.props.mode === 'edit' ? `Update ${this.props.submitText}` : `Add ${this.props.submitText}`}
                 </button>
             </Form>
         )
@@ -93,10 +74,6 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
 
     private onDisplayNameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
         this.props.onChange({ ...this.props.input, displayName: event.currentTarget.value })
-    }
-
-    private onKindChange: React.ChangeEventHandler<HTMLSelectElement> = event => {
-        this.props.onChange({ ...this.props.input, kind: event.currentTarget.value as GQL.ExternalServiceKind })
     }
 
     private onConfigChange = (config: string) => {

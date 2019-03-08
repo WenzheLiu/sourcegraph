@@ -37,11 +37,18 @@ export const GITHUB_EXTERNAL_SERVICE: ExternalServiceMetadata = {
 }`,
 }
 
-export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServiceMetadata> = {
+type ExternalServiceQualifiers = 'githubcom'
+
+type ExternalServicesMetadata = {
+    default: ExternalServiceMetadata
+} & { [K in ExternalServiceQualifiers]?: ExternalServiceMetadata }
+
+export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServicesMetadata> = {
     [GQL.ExternalServiceKind.AWSCODECOMMIT]: {
-        jsonSchema: awsCodeCommitSchemaJSON,
-        displayName: 'AWS CodeCommit',
-        defaultConfig: `{
+        default: {
+            jsonSchema: awsCodeCommitSchemaJSON,
+            displayName: 'AWS CodeCommit',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#awscodecommitconnection-object
@@ -50,11 +57,13 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   "accessKeyID": "",
   "secretAccessKey": ""
 }`,
+        },
     },
     [GQL.ExternalServiceKind.BITBUCKETSERVER]: {
-        jsonSchema: bitbucketServerSchemaJSON,
-        displayName: 'Bitbucket Server',
-        defaultConfig: `{
+        default: {
+            jsonSchema: bitbucketServerSchemaJSON,
+            displayName: 'Bitbucket Server',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#bitbucketserverconnection-object
@@ -65,12 +74,14 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   // https://[your-bitbucket-hostname]/plugins/servlet/access-tokens/add
   "token": ""
 }`,
+        },
     },
-    [GQL.ExternalServiceKind.GITHUB]: GITHUB_EXTERNAL_SERVICE,
+    [GQL.ExternalServiceKind.GITHUB]: { default: GITHUB_EXTERNAL_SERVICE },
     [GQL.ExternalServiceKind.GITLAB]: {
-        jsonSchema: gitlabSchemaJSON,
-        displayName: 'GitLab',
-        defaultConfig: `{
+        default: {
+            jsonSchema: gitlabSchemaJSON,
+            displayName: 'GitLab',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#gitlabconnection-object
@@ -81,11 +92,13 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   // https://[your-gitlab-hostname]/profile/personal_access_tokens
   "token": ""
 }`,
+        },
     },
     [GQL.ExternalServiceKind.GITOLITE]: {
-        jsonSchema: gitoliteSchemaJSON,
-        displayName: 'Gitolite',
-        defaultConfig: `{
+        default: {
+            jsonSchema: gitoliteSchemaJSON,
+            displayName: 'Gitolite',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#gitoliteconnection-object
@@ -93,11 +106,13 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   "prefix": "gitolite.example.com/",
   "host": "git@gitolite.example.com"
 }`,
+        },
     },
     [GQL.ExternalServiceKind.PHABRICATOR]: {
-        jsonSchema: phabricatorSchemaJSON,
-        displayName: 'Phabricator',
-        defaultConfig: `{
+        default: {
+            jsonSchema: phabricatorSchemaJSON,
+            displayName: 'Phabricator',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#phabricatorconnection-object
@@ -106,11 +121,13 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   "token": "",
   "repos": []
 }`,
+        },
     },
     [GQL.ExternalServiceKind.OTHER]: {
-        jsonSchema: otherExternalServiceSchemaJSON,
-        displayName: 'Other',
-        defaultConfig: `{
+        default: {
+            jsonSchema: otherExternalServiceSchemaJSON,
+            displayName: 'Other',
+            defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
   // https://docs.sourcegraph.com/admin/site_config/all#otherexternalserviceconnection-object
@@ -121,5 +138,18 @@ export const ALL_EXTERNAL_SERVICES: Record<GQL.ExternalServiceKind, ExternalServ
   // Repository clone paths may be relative to the url (preferred) or absolute.
   "repos": []
 }`,
+        },
     },
+}
+
+export function getExternalService(kind: GQL.ExternalServiceKind, qualifier?: string): ExternalServiceMetadata {
+    const servicesMetadata = ALL_EXTERNAL_SERVICES[kind]
+    if (!qualifier || !servicesMetadata[qualifier]) {
+        return servicesMetadata.default
+    }
+    return servicesMetadata[qualifier]
+}
+
+export function getExternalServiceKinds(): GQL.ExternalServiceKind[] {
+    return Object.entries(ALL_EXTERNAL_SERVICES)
 }

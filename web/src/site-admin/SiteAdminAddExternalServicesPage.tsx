@@ -1,32 +1,70 @@
 import * as H from 'history'
 import React from 'react'
+import { noop } from 'rxjs'
 import { LinkOrButton } from '../../../shared/src/components/LinkOrButton'
 import { ExternalServiceKind } from '../../../shared/src/graphql/schema'
 import * as GQL from '../../../shared/src/graphql/schema'
 import { PageTitle } from '../components/PageTitle'
-import { ALL_EXTERNAL_SERVICES } from './externalServices'
+import { ThemeProps } from '../theme'
+import { ALL_EXTERNAL_SERVICES, getExternalService } from './externalServices'
+import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm2'
 
-interface ButtonProps {
-    kind: ExternalServiceKind
-    text: string
-    secondaryKind?: string // TODO(beyang): e.g., github.com vs GH Enterprise, populate with different default config
-}
-
-interface SiteAdminAddExternalServiceProps {
+interface SiteAdminAddExternalServiceProps extends ThemeProps {
     history: H.History
+    kind: ExternalServiceKind
+    title: string
+    displayName: string
+    submitText: string
+    helpElement?: JSX.Element | string
 }
+
 interface SiteAdminAddExternalServiceState {}
+
+// function externalServicePropsForKind(kind: ExternalServiceKind): SiteAdminAddExternalServiceProps | null {
+// }
 
 export class SiteAdminAddExternalServicePage extends React.Component<
     SiteAdminAddExternalServiceProps,
     SiteAdminAddExternalServiceState
 > {
+    // private getExternalServiceInput(): GQL.IAddExternalServiceInput {
+    //     return this.getExternalServiceKind()
+    //         ? {
+    //               displayName: this.state.displayName,
+    //               config: this.state.config,
+    //               kind: this.getExternalServiceKind(),
+    //           }
+    //         : null
+    // }
+
     public render(): JSX.Element | null {
-        return <div>TODO</div>
+        return (
+            <div className="add-external-service-page">
+                <PageTitle title={this.props.title} />
+                <h1>{this.props.title}</h1>
+                {this.props.helpElement ? <div>{this.props.helpElement}</div> : undefined}
+                <SiteAdminExternalServiceForm
+                    // error={this.state.error}
+                    input={{
+                        displayName: this.props.displayName,
+                        config: 'TODO: config',
+                        kind: this.props.kind,
+                    }}
+                    {...this.props}
+                    mode="create"
+                    loading={false}
+                    onSubmit={noop}
+                    onChange={noop}
+                    // loading={this.state.loading}
+                    // onSubmit={this.onSubmit}
+                    // onChange={this.onChange}
+                />
+            </div>
+        )
     }
 }
 
-interface SiteAdminAddExternalServicesProps {
+interface SiteAdminAddExternalServicesProps extends ThemeProps {
     history: H.History
     eventLogger: {
         logViewEvent: (event: 'AddExternalService') => void
@@ -35,6 +73,12 @@ interface SiteAdminAddExternalServicesProps {
 }
 
 interface SiteAdminAddExternalServicesState {}
+
+interface ButtonProps {
+    kind: ExternalServiceKind
+    text: string
+    secondaryKind?: string // TODO(beyang): e.g., github.com vs GH Enterprise, populate with different default config
+}
 
 export class SiteAdminAddExternalServicesPage extends React.Component<
     SiteAdminAddExternalServicesProps,
@@ -47,14 +91,23 @@ export class SiteAdminAddExternalServicesPage extends React.Component<
             kind = kind.toUpperCase()
         }
         const isKnownKind = (kind: string): kind is GQL.ExternalServiceKind =>
-            !!ALL_EXTERNAL_SERVICES[kind as GQL.ExternalServiceKind]
+            !!getExternalService(kind as GQL.ExternalServiceKind)
         return kind && isKnownKind(kind) ? kind : null
     }
 
     public render(): JSX.Element | null {
         const kind = this.getExternalServiceKind()
         if (kind) {
-            return <div>TODO</div>
+            return (
+                <SiteAdminAddExternalServicePage
+                    {...this.props}
+                    title="TODO: title"
+                    displayName="TODO: displayName"
+                    submitText="TODO: submit"
+                    helpElement="TODO: help"
+                    kind={ExternalServiceKind.GITHUB}
+                />
+            )
         } else {
             const buttons: ButtonProps[] = [
                 {

@@ -8,7 +8,7 @@ import { createAggregateError } from '../../../shared/src/util/errors'
 import { mutateGraphQL } from '../backend/graphql'
 import { PageTitle } from '../components/PageTitle'
 import { refreshSiteFlags } from '../site/backend'
-import { ALL_EXTERNAL_SERVICES, ExternalServiceMetadata } from './externalServices'
+import { ALL_EXTERNAL_SERVICES, ExternalServiceMetadata, getExternalService } from './externalServices'
 import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm'
 
 interface Props {
@@ -55,12 +55,12 @@ export class SiteAdminAddExternalServicePage extends React.Component<Props, Stat
             kind = kind.toUpperCase()
         }
         const isKnownKind = (kind: string): kind is GQL.ExternalServiceKind =>
-            !!ALL_EXTERNAL_SERVICES[kind as GQL.ExternalServiceKind]
+            !!getExternalService(kind as GQL.ExternalServiceKind)
         return kind && isKnownKind(kind) ? kind : GQL.ExternalServiceKind.GITHUB // default to GitHub
     }
 
     private getExternalServiceMetadata(kind?: string | GQL.ExternalServiceKind): ExternalServiceMetadata {
-        return ALL_EXTERNAL_SERVICES[this.getExternalServiceKind(kind)]
+        return getExternalService(this.getExternalServiceKind(kind))
     }
 
     private getExternalServiceInput(): GQL.IAddExternalServiceInput {
