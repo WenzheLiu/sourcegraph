@@ -25,7 +25,19 @@ export const GITHUB_EXTERNAL_SERVICE: ExternalServiceMetadata = {
     title: 'GitHub repositories',
     jsonSchema: githubSchemaJSON,
     displayName: 'GitHub',
-    helpElement: <span>This is help</span>,
+    helpElement: (
+        <span>
+            Adding this configuration enables Sourcegraph to sync repositories from GitHub. Click the "quick configure"
+            buttons for common actions or directly edit the JSON configuration.{' '}
+            <a
+                target="_blank"
+                href="https://docs.sourcegraph.com/integration/github#github-integration-with-sourcegraph"
+            >
+                Read the docs
+            </a>{' '}
+            for more info about each field.
+        </span>
+    ),
     defaultConfig: `{
   // Use Ctrl+Space for completion, and hover over JSON properties for documentation.
   // Configuration options are documented here:
