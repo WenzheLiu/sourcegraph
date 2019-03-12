@@ -3,14 +3,13 @@ import { map } from 'lodash'
 import React from 'react'
 import { noop } from 'rxjs'
 import { LinkOrButton } from '../../../shared/src/components/LinkOrButton'
-import * as GQL from '../../../shared/src/graphql/schema'
 import { ExternalServiceKind } from '../../../shared/src/graphql/schema'
+import * as GQL from '../../../shared/src/graphql/schema'
 import { PageTitle } from '../components/PageTitle'
 import { ThemeProps } from '../theme'
+import { ExternalServiceButton } from './ExternalServiceButton'
 import { AddExternalServiceMetadata, ALL_ADD_EXTERNAL_SERVICES, getExternalService } from './externalServices'
 import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm2'
-import { flatMap } from 'rxjs/operators'
-import { ExternalServiceButton } from './ExternalServiceButton'
 
 interface SiteAdminAddExternalServiceProps extends ThemeProps {
     history: H.History
@@ -27,13 +26,10 @@ export class SiteAdminAddExternalServicePage extends React.Component<
         const externalService = getExternalService(this.props.kind)
         return (
             <div className="add-external-service-page">
-                <PageTitle title={externalService.title} />
-                <h1>Add {externalService.title}</h1>
-                {externalService.longDescription ? (
-                    <div className="alert alert-info">{externalService.longDescription}</div>
-                ) : (
-                    undefined
-                )}
+                <PageTitle title="Add external service" />
+                <h1>Add external service</h1>
+                <ExternalServiceButton {...externalService} />
+                <p>{externalService.longDescription}</p>
                 <SiteAdminExternalServiceForm
                     // error={this.state.error}
                     externalService={getExternalService(this.props.kind)}
