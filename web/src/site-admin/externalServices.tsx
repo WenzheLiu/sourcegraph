@@ -226,7 +226,18 @@ export function getExternalService(kind: GQL.ExternalServiceKind): ExternalServi
     return ALL_EXTERNAL_SERVICES[kind]
 }
 
-type ExternalServiceQualifier = 'dotcom' | 'enterprise'
+export type ExternalServiceQualifier = 'dotcom' | 'enterprise'
+
+export function asExternalServiceQualifier(s: string | null): ExternalServiceQualifier | null {
+    if (!s) {
+        return null
+    }
+    const sLower = s.toLowerCase()
+    if (sLower === 'dotcom' || sLower === 'enterprise') {
+        return sLower as ExternalServiceQualifier
+    }
+    return null
+}
 
 export interface AddExternalServiceMetadata extends ExternalServiceMetadata {
     serviceKind: GQL.ExternalServiceKind

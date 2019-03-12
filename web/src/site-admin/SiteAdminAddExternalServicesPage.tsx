@@ -8,12 +8,19 @@ import * as GQL from '../../../shared/src/graphql/schema'
 import { PageTitle } from '../components/PageTitle'
 import { ThemeProps } from '../theme'
 import { ExternalServiceButton } from './ExternalServiceButton'
-import { AddExternalServiceMetadata, ALL_ADD_EXTERNAL_SERVICES, getExternalService } from './externalServices'
+import {
+    AddExternalServiceMetadata,
+    ALL_ADD_EXTERNAL_SERVICES,
+    asExternalServiceQualifier,
+    ExternalServiceQualifier,
+    getExternalService,
+} from './externalServices'
 import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm2'
 
 interface SiteAdminAddExternalServiceProps extends ThemeProps {
     history: H.History
     kind: ExternalServiceKind
+    qualifier?: ExternalServiceQualifier
 }
 
 interface SiteAdminAddExternalServiceState {}
@@ -33,6 +40,8 @@ export class SiteAdminAddExternalServicePage extends React.Component<
                 <SiteAdminExternalServiceForm
                     // error={this.state.error}
                     externalService={getExternalService(this.props.kind)}
+                    externalServiceKind={this.props.kind}
+                    externalServiceQualifier={this.props.qualifier}
                     {...this.props}
                     mode="create"
                     loading={false}
@@ -61,7 +70,7 @@ export class SiteAdminAddExternalServicesPage extends React.Component<
     SiteAdminAddExternalServicesProps,
     SiteAdminAddExternalServicesState
 > {
-    private getExternalServiceKind(): GQL.ExternalServiceKind | null {
+    private getExternalServiceKind(): [GQL.ExternalServiceKind | null, ExternalServiceQualifier | null] {
         const params = new URLSearchParams(this.props.history.location.search)
         let kind = params.get('kind') || undefined
         if (kind) {
@@ -69,7 +78,8 @@ export class SiteAdminAddExternalServicesPage extends React.Component<
         }
         const isKnownKind = (kind: string): kind is GQL.ExternalServiceKind =>
             !!getExternalService(kind as GQL.ExternalServiceKind)
-        return kind && isKnownKind(kind) ? kind : null
+
+        return [kind && isKnownKind(kind) ? kind : null, asExternalServiceQualifier(params.get('qualifier'))]
     }
 
     private static addServiceURL(addService: AddExternalServiceMetadata): string {
@@ -83,9 +93,9 @@ export class SiteAdminAddExternalServicesPage extends React.Component<
     }
 
     public render(): JSX.Element | null {
-        const kind = this.getExternalServiceKind()
+        const [kind, qualifier] = this.getExternalServiceKind()
         if (kind) {
-            return <SiteAdminAddExternalServicePage {...this.props} kind={kind} />
+            return <SiteAdminAddExternalServicePage {...this.props} kind={kind} qualifier={qualifier || undefined} />
         } else {
             const addExternalServices = ALL_ADD_EXTERNAL_SERVICES
             return (
