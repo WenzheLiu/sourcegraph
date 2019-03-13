@@ -9,12 +9,14 @@ import { ErrorLike } from '../../../shared/src/util/errors'
 import { Form } from '../components/Form'
 import { DynamicallyImportedMonacoSettingsEditor } from '../settings/DynamicallyImportedMonacoSettingsEditor'
 import { EditorAction } from './configHelpers'
-import { ExternalServiceMetadata, ExternalServiceQualifier } from './externalServices'
+import { ExternalServiceMetadata, ExternalServiceQualifier, getExternalService } from './externalServices'
 
 interface Props {
     history: H.History
-    externalServiceKind: GQL.ExternalServiceKind
-    externalServiceQualifier?: ExternalServiceQualifier
+    input: GQL.IAddExternalServiceInput
+    // externalServiceKind: GQL.ExternalServiceKind
+    // externalServiceQualifier?: ExternalServiceQualifier
+    editorActions: EditorAction[]
     externalService: ExternalServiceMetadata
     isLightTheme: boolean
     error?: ErrorLike
@@ -24,72 +26,8 @@ interface Props {
     onChange: (change: GQL.IAddExternalServiceInput) => void
 }
 
-const defaultFormattingOptions: FormattingOptions = {
-    eol: '\n',
-    insertSpaces: true,
-    tabSize: 2,
-}
-
-const gitHubEditorActions: EditorAction[] = [
-    {
-        id: 'setAccessToken',
-        label: 'Set access token',
-        run: config => {
-            const value = '<GitHub personal access token>'
-            const edits = setProperty(config, ['token'], value, defaultFormattingOptions)
-            return { edits, selectText: '<GitHub personal access token>' }
-        },
-    },
-    {
-        id: 'addOrgRepo',
-        label: 'Add organization repositories',
-        run: config => {
-            const value = 'org:<organization name>'
-            const edits = setProperty(config, ['repositoryQuery', -1], value, defaultFormattingOptions)
-            return { edits, selectText: '<organization name>' }
-        },
-    },
-    {
-        id: 'addSingleRepo',
-        label: 'Add single repository',
-        run: config => {
-            const value = '<GitHub owner>/<GitHub repository name>'
-            const edits = setProperty(config, ['repos', -1], value, defaultFormattingOptions)
-            return { edits, selectText: '<GitHub owner>/<GitHub repository name>' }
-        },
-    },
-    {
-        id: 'addSearchQueryRepos',
-        label: 'Add repositories matching search query',
-        run: config => {
-            const value = '<GitHub search query>'
-            const edits = setProperty(config, ['repositoryQuery', -1], value, defaultFormattingOptions)
-            return { edits, selectText: '<GitHub search query>' }
-        },
-    },
-]
-const gitHubDotComEditorActions: EditorAction[] = [
-    {
-        id: 'addPublicRepo',
-        label: 'Add public repository',
-        run: config => {
-            const value = '<GitHub owner>/<GitHub repository name>'
-            const edits = setProperty(config, ['repos', -1], value, defaultFormattingOptions)
-            return { edits, selectText: '<GitHub owner>/<GitHub repository name>' }
-        },
-    },
-]
-
 export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
     public render(): JSX.Element | null {
-        const editorActions: EditorAction[] = []
-        if (this.props.externalServiceKind === GQL.ExternalServiceKind.GITHUB) {
-            editorActions.push(...gitHubEditorActions)
-            if (this.props.externalServiceQualifier === 'dotcom') {
-                editorActions.push(...gitHubDotComEditorActions)
-            }
-        }
-
         return (
             <Form className="external-service-form" onSubmit={this.props.onSubmit}>
                 {this.props.error && <p className="alert alert-danger">{upperFirst(this.props.error.message)}</p>}
@@ -104,7 +42,7 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                         autoComplete="off"
                         autoFocus={true}
                         spellCheck={false}
-                        value={this.props.externalService.defaultDisplayName}
+                        value={this.props.input.displayName}
                         onChange={this.onDisplayNameChange}
                         disabled={this.props.loading}
                     />
@@ -115,7 +53,7 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                         // DynamicallyImportedMonacoSettingsEditor does not re-render the passed input.config
                         // if it thinks the config is dirty. We want to always replace the config if the kind changes
                         // so the editor is keyed on the kind.
-                        value={this.props.externalService.defaultConfig}
+                        value={this.props.input.config}
                         jsonSchema={this.props.externalService.jsonSchema}
                         canEdit={false}
                         loading={this.props.loading}
@@ -123,7 +61,7 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                         isLightTheme={this.props.isLightTheme}
                         onChange={this.onConfigChange}
                         history={this.props.history}
-                        actions={editorActions}
+                        actions={this.props.editorActions}
                     />
                     <p className="form-text text-muted">
                         <small>Use Ctrl+Space for completion, and hover over JSON properties for documentation.</small>
@@ -135,19 +73,17 @@ export class SiteAdminExternalServiceForm extends React.Component<Props, {}> {
                     disabled={this.props.loading}
                 >
                     {this.props.loading && <LoadingSpinner className="icon-inline" />}
-                    {this.props.mode === 'edit'
-                        ? `Update ${this.props.externalService.title}`
-                        : `Add ${this.props.externalService.title}`}
+                    {this.props.mode === 'edit' ? 'Update external service' : 'Add external service'}
                 </button>
             </Form>
         )
     }
 
-    private onDisplayNameChange: React.ChangeEventHandler<HTMLInputElement> = () => {
-        // this.props.onChange({ ...this.props.input, displayName: event.currentTarget.value })
+    private onDisplayNameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+        this.props.onChange({ ...this.props.input, displayName: event.currentTarget.value })
     }
 
-    private onConfigChange = () => {
-        // this.props.onChange({ ...this.props.input, config })
+    private onConfigChange = (config: string) => {
+        this.props.onChange({ ...this.props.input, config })
     }
 }

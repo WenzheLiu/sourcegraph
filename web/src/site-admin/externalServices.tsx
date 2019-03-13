@@ -1,3 +1,5 @@
+import { FormattingOptions } from '@sqs/jsonc-parser'
+import { setProperty } from '@sqs/jsonc-parser/lib/edit'
 import { flatMap, map } from 'lodash'
 import AmazonIcon from 'mdi-react/AmazonIcon'
 import BitbucketIcon from 'mdi-react/BitbucketIcon'
@@ -13,6 +15,8 @@ import gitoliteSchemaJSON from '../../../schema/gitolite.schema.json'
 import otherExternalServiceSchemaJSON from '../../../schema/other_external_service.schema.json'
 import phabricatorSchemaJSON from '../../../schema/phabricator.schema.json'
 import * as GQL from '../../../shared/src/graphql/schema'
+import { EditorAction } from './configHelpers.js'
+import { QualifiedTypeIdentifier } from '@babel/types'
 
 const iconSize = 50
 
@@ -295,3 +299,71 @@ export const ALL_ADD_EXTERNAL_SERVICES: AddExternalServiceMetadata[] = flatMap(
         }
     )
 )
+
+const defaultFormattingOptions: FormattingOptions = {
+    eol: '\n',
+    insertSpaces: true,
+    tabSize: 2,
+}
+
+export function getEditorActions(kind: GQL.ExternalServiceKind, qualifier?: ExternalServiceQualifier): EditorAction[] {
+    const editorActions: EditorAction[] = []
+    if (kind === GQL.ExternalServiceKind.GITHUB) {
+        editorActions.push(...gitHubEditorActions)
+        if (qualifier === 'dotcom') {
+            editorActions.push(...gitHubDotComEditorActions)
+        }
+    }
+    return editorActions
+}
+
+export const gitHubEditorActions: EditorAction[] = [
+    {
+        id: 'setAccessToken',
+        label: 'Set access token',
+        run: config => {
+            const value = '<GitHub personal access token>'
+            const edits = setProperty(config, ['token'], value, defaultFormattingOptions)
+            return { edits, selectText: '<GitHub personal access token>' }
+        },
+    },
+    {
+        id: 'addOrgRepo',
+        label: 'Add organization repositories',
+        run: config => {
+            const value = 'org:<organization name>'
+            const edits = setProperty(config, ['repositoryQuery', -1], value, defaultFormattingOptions)
+            return { edits, selectText: '<organization name>' }
+        },
+    },
+    {
+        id: 'addSingleRepo',
+        label: 'Add single repository',
+        run: config => {
+            const value = '<GitHub owner>/<GitHub repository name>'
+            const edits = setProperty(config, ['repos', -1], value, defaultFormattingOptions)
+            return { edits, selectText: '<GitHub owner>/<GitHub repository name>' }
+        },
+    },
+    {
+        id: 'addSearchQueryRepos',
+        label: 'Add repositories matching search query',
+        run: config => {
+            const value = '<GitHub search query>'
+            const edits = setProperty(config, ['repositoryQuery', -1], value, defaultFormattingOptions)
+            return { edits, selectText: '<GitHub search query>' }
+        },
+    },
+]
+
+export const gitHubDotComEditorActions: EditorAction[] = [
+    {
+        id: 'addPublicRepo',
+        label: 'Add public repository',
+        run: config => {
+            const value = '<GitHub owner>/<GitHub repository name>'
+            const edits = setProperty(config, ['repos', -1], value, defaultFormattingOptions)
+            return { edits, selectText: '<GitHub owner>/<GitHub repository name>' }
+        },
+    },
+]

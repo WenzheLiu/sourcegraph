@@ -10,7 +10,9 @@ import { asError, ErrorLike, isErrorLike } from '../../../shared/src/util/errors
 import { queryGraphQL } from '../backend/graphql'
 import { PageTitle } from '../components/PageTitle'
 import { eventLogger } from '../tracking/eventLogger'
-import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm'
+import { SiteAdminExternalServiceForm } from './SiteAdminExternalServiceForm2'
+import { getEditorActions, getExternalService } from './externalServices'
+import { ExternalServiceButton } from './ExternalServiceButton'
 
 interface Props extends RouteComponentProps<{ id: GQL.ID }> {
     isLightTheme: boolean
@@ -111,17 +113,20 @@ export class SiteAdminExternalServicePage extends React.Component<Props, State> 
                 ) : (
                     <PageTitle title="External service" />
                 )}
-                <h2>External service</h2>
+                <h2>Update external service</h2>
                 {this.state.externalServiceOrError === LOADING && <LoadingSpinner className="icon-inline" />}
                 {isErrorLike(this.state.externalServiceOrError) && (
                     <p className="alert alert-danger">{upperFirst(this.state.externalServiceOrError.message)}</p>
                 )}
+                {externalService && <ExternalServiceButton {...getExternalService(externalService.kind)} />}
                 {externalService && (
                     <SiteAdminExternalServiceForm
+                        externalService={getExternalService(externalService.kind)}
                         input={externalService}
                         error={error}
                         mode="edit"
                         loading={this.state.updatedOrError === LOADING}
+                        editorActions={getEditorActions(externalService.kind)}
                         onSubmit={this.onSubmit}
                         onChange={this.onChange}
                         history={this.props.history}
